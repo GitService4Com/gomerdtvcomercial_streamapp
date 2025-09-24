@@ -10,18 +10,30 @@ power_bi_links = [
 		"https://app.powerbi.com/view?r=eyJrIjoiMTFkOGU0YjYtZTdmMy00NmNmLTk0YmYtNDQ3MGYyMzVkZmUwIiwidCI6Ijk0MTc0NTRiLTRhYWMtNDY5MS04MWIyLTc3NmU3OWI5MzA0YiJ9&pageName=6fde331acb98af207c25"
 ]
 
-# Tempo entre trocas de aba (em segundos)
-refresh_time = 30
+# Tempo em segundos para trocar de aba
+switch_interval = 30
 
-# Posição atual (salva no estado da sessão)
-if "page_index" not in st.session_state:
+# Armazena o tempo da última troca
+if 'last_switch' not in st.session_state:
+    st.session_state.last_switch = time.time()
     st.session_state.page_index = 0
-else:
-    st.session_state.page_index = (st.session_state.page_index + 1) % len(power_bi_links)
 
-# Mostra o iframe do Power BI
+# Verifica se passou o tempo de troca
+if time.time() - st.session_state.last_switch > switch_interval:
+    st.session_state.page_index = (st.session_state.page_index + 1) % len(power_bi_links)
+    st.session_state.last_switch = time.time()
+
+# Mostra o iframe com o relatório atual
 st.components.v1.iframe(power_bi_links[st.session_state.page_index], height=600)
 
-# Aguarda e força recarregamento da página Streamlit
-time.sleep(refresh_time)
-st.experimental_rerun()
+# Adiciona auto-refresh usando JavaScript
+st.markdown(
+    f"""
+    <script>
+        setTimeout(function(){{
+            window.location.reload();
+        }}, {switch_interval * 1000});
+    </script>
+    """,
+    unsafe_allow_html=True
+)

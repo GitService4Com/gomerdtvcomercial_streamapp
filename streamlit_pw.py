@@ -16,30 +16,36 @@ pages = [
 base_url = "https://app.powerbi.com/view?r=eyJrIjoiMTFkOGU0YjYtZTdmMy00NmNmLTk0YmYtNDQ3MGYyMzVkZmUwIiwidCI6Ijk0MTc0NTRiLTRhYWMtNDY5MS04MWIyLTc3NmU3OWI5MzA0YiJ9&embedImagePlaceholder=true"
 
 
-# Tempo de troca (em segundos)
-interval = 30
 
-# Pega o tempo atual (em segundos desde a Epoch)
-elapsed_time = int(time.time())
+# Intervalo de troca em milissegundos (ex: 30 segundos = 30000)
+interval_ms = 30000
 
-# Determina qual página mostrar com base no tempo
-current_index = (elapsed_time // interval) % len(pages)
-current_page = pages[current_index]
+# Código HTML com JavaScript para trocar de aba automaticamente
+html_code = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        let pages = {pages};
+        let index = 0;
 
-# Monta a URL com a página atual
-url = f"{base_url}&pageName={current_page}"
+        function updateIframe() {{
+            let iframe = document.getElementById("powerbi-frame");
+            iframe.src = "{base_url}&pageName=" + pages[index];
+            index = (index + 1) % pages.length;
+        }}
 
-# HTML com JavaScript para recarregar a página a cada 30 segundos
-refresh_code = f"""
-    <script>
-        setTimeout(function(){{
-            window.location.reload();
-        }}, {interval * 1000}); // {interval} segundos
+        window.onload = function() {{
+            updateIframe();  // Carrega a primeira aba
+            setInterval(updateIframe, {interval_ms});  // Troca a cada 30s
+        }};
     </script>
+</head>
+<body>
+    <iframe id="powerbi-frame" width="1000" height="700" frameborder="0" allowFullScreen="true"></iframe>
+</body>
+</html>
 """
 
-# Renderiza o HTML com auto-reload
-st.components.v1.html(refresh_code, height=0)
-
-# Exibe o Power BI em iframe
-st.components.v1.iframe(url, width=1000, height=700)
+# Renderiza o HTML no Streamlit
+st.components.v1.html(html_code, height=750)

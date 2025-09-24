@@ -57,4 +57,4 @@ html_code = f"""
 """
 
 # Exibe o HTML com altura dinâmica (viewport height)
-st.components.v1.html(html_code, height=900)  # você pode ajustar aqui se quiser mais espaço
+st.components.v1.html(html_code, height=1280)  # você pode ajustar aqui se quiser mais espaço

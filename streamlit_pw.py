@@ -15,16 +15,25 @@ pages = [
 # Link base do seu relatório (sem pageName)
 base_url = "https://app.powerbi.com/view?r=eyJrIjoiMTFkOGU0YjYtZTdmMy00NmNmLTk0YmYtNDQ3MGYyMzVkZmUwIiwidCI6Ijk0MTc0NTRiLTRhYWMtNDY5MS04MWIyLTc3NmU3OWI5MzA0YiJ9&embedImagePlaceholder=true"
 
-
-
-# Intervalo de troca em milissegundos (ex: 30 segundos = 30000)
+# Intervalo de troca em milissegundos (30 segundos)
 interval_ms = 30000
 
-# Código HTML com JavaScript para trocar de aba automaticamente
+# Código HTML com JavaScript para trocar as páginas
 html_code = f"""
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        body {{
+            margin: 0;
+            padding: 0;
+        }}
+        iframe {{
+            width: 100%;
+            height: 100vh; /* usa toda a altura da tela visível */
+            border: none;
+        }}
+    </style>
     <script type="text/javascript">
         let pages = {pages};
         let index = 0;
@@ -36,16 +45,16 @@ html_code = f"""
         }}
 
         window.onload = function() {{
-            updateIframe();  // Carrega a primeira aba
-            setInterval(updateIframe, {interval_ms});  // Troca a cada 30s
+            updateIframe();
+            setInterval(updateIframe, {interval_ms});
         }};
     </script>
 </head>
 <body>
-    <iframe id="powerbi-frame" width="1000" height="700" frameborder="0" allowFullScreen="true"></iframe>
+    <iframe id="powerbi-frame" allowfullscreen="true"></iframe>
 </body>
 </html>
 """
 
-# Renderiza o HTML no Streamlit
-st.components.v1.html(html_code, height=750)
+# Exibe o HTML com altura dinâmica (viewport height)
+st.components.v1.html(html_code, height=900)  # você pode ajustar aqui se quiser mais espaço

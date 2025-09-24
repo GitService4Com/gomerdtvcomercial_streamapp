@@ -15,10 +15,11 @@ pages = [
 # Link base do seu relatório (sem pageName)
 base_url = "https://app.powerbi.com/view?r=eyJrIjoiMTFkOGU0YjYtZTdmMy00NmNmLTk0YmYtNDQ3MGYyMzVkZmUwIiwidCI6Ijk0MTc0NTRiLTRhYWMtNDY5MS04MWIyLTc3NmU3OWI5MzA0YiJ9&embedImagePlaceholder=true"
 
+
 # Tempo de troca (em segundos)
 interval = 30
 
-# Pega o tempo atual (em segundos) desde o início da execução
+# Pega o tempo atual (em segundos desde a Epoch)
 elapsed_time = int(time.time())
 
 # Determina qual página mostrar com base no tempo
@@ -27,6 +28,18 @@ current_page = pages[current_index]
 
 # Monta a URL com a página atual
 url = f"{base_url}&pageName={current_page}"
+
+# HTML com JavaScript para recarregar a página a cada 30 segundos
+refresh_code = f"""
+    <script>
+        setTimeout(function(){{
+            window.location.reload();
+        }}, {interval * 1000}); // {interval} segundos
+    </script>
+"""
+
+# Renderiza o HTML com auto-reload
+st.components.v1.html(refresh_code, height=0)
 
 # Exibe o Power BI em iframe
 st.components.v1.iframe(url, width=1000, height=700)
